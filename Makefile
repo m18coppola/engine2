@@ -21,7 +21,7 @@ main: ${OBJ}
 	${CC} -o $@ ${OBJ} ${LDFLAGS}
 
 clean:
-	rm -f main ${OBJS}
+	rm -f main ${OBJ}
 
 run: main
 	./main
