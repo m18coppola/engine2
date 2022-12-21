@@ -4,6 +4,22 @@
 
 #define BUFFER_SIZE 128
 
+typedef enum {
+    NONE = 0, //timestamp is valid
+    KEY, //val1 is keycode, val2 is 1 if down event, 0 if up event
+    CHAR, // val1 is a char
+    MOUSE, //val1,val2 is x,y respectively
+    CONSOLE, //data is *char
+    PACKET //TBD
+} EventType;
+
+typedef struct {
+    int time;
+    EventType type;
+    int val1, val2;
+    int data_size;
+    void *data;
+} Event;
 
 static SDL_Thread *cli_thread;
 static SDL_sem *command_ready;
