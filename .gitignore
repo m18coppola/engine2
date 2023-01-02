@@ -1,2 +1,4 @@
 *.o
 main
+log.txt
+cscope.out

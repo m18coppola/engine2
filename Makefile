@@ -1,6 +1,6 @@
 include config.mk
 
-SRC = main.c lib_datastructure.c
+SRC = main.c logger.c event.c
 OBJ = ${SRC:.c=.o}
 
 all: options main
