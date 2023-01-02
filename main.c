@@ -70,61 +70,40 @@ collect_events(void)
     }
 
 
-    //KB
 	SDL_Event e;
     while (SDL_PollEvent(&e) != 0) {
-        if (e.type == SDL_KEYDOWN || e.type == SDL_KEYUP) {
-            eventqueue_post(evt_id++
-                    ,KEY
-                    ,e.key.keysym.sym
-                    ,(e.type == SDL_KEYDOWN) ? 1 : 0
-                    ,0
-                    ,NULL);
-        }
-        if (e.type == SDL_QUIT) {
-            SDL_Quit();
-            exit(0);
-        };
-    }
-}
-
-void
-process_events(void)
-{
-    int deffered_exit = 0;
-    while(!eventqueue_is_empty()) {
-        struct Event *ev;
-        ev = eventqueue_poll();
-        char msg[512];
-        switch (ev->type) {
-            case CONSOLE:
-                log_append(LOG, (char *)ev->data);
-                if (!strcmp(ev->data, "exit")) {
-                    deffered_exit = 1;
-                }
-                free(ev->data);
+        switch (e.type) {
+            case SDL_KEYDOWN:
+            case SDL_KEYUP:
+                eventqueue_post(evt_id++
+                        ,KEY
+                        ,e.key.keysym.sym
+                        ,(e.type == SDL_KEYDOWN) ? 1 : 0
+                        ,0
+                        ,NULL);
                 break;
-            case KEY:
-                sprintf(msg
-                        ,"key: %c, evt: %s"
-                        ,ev->val1, (ev->val2) ? "DOWN" : "UP");
-                log_append(LOG_MESG, msg);
-                
+            case SDL_MOUSEBUTTONDOWN:
+            case SDL_MOUSEBUTTONUP:
+                eventqueue_post(evt_id++
+                        ,KEY
+                        ,e.button.button
+                        ,(e.button.type == SDL_MOUSEBUTTONDOWN) ? 1 : 0
+                        ,0
+                        ,NULL);
                 break;
-            default:
-                sprintf(msg
-                        ,"bad event type: %d"
-                        ,ev->type);
-                log_append(LOG_ERR, msg);
+            case SDL_MOUSEMOTION:
+                eventqueue_post(evt_id++
+                        ,MOUSE
+                        ,e.motion.x
+                        ,e.motion.y
+                        ,0
+                        ,NULL);
                 break;
+            case SDL_QUIT:
+                exit(0);
         }
     }
-    if (deffered_exit) {
-        SDL_Quit();
-        exit(0);
-    }
 }
-
 
 int
 init_window(int width, int height)
@@ -142,7 +121,6 @@ init_window(int width, int height)
     render = SDL_CreateRenderer(window, -1, 0);
     return 0;
 }
-
 
 int
 main(int argc, char **argv)

@@ -8,15 +8,6 @@ enum EventType {
     DEBUG
 };
 
-struct Event {
-    int time;
-    enum EventType type;
-    int val1, val2;
-    int data_size;
-    void *data;
-};
-
-
 int init_event_system(int buffer_length);
 void close_event_system(void);
 int eventqueue_is_empty(void);
@@ -24,3 +15,4 @@ int eventqueue_is_full(void);
 int eventqueue_post(int time, enum EventType type, int val1, int val2, int data_size, char *data);
 struct Event *eventqueue_poll(void);
 void buffer_events(void);
+void process_events(void);
