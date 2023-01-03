@@ -16,7 +16,7 @@ LIBS = ${MATHLIBS} ${SDLLIBS}
 INCS = ${SDLINC} 
 
 # flags
-CFLAGS = -Wall -g ${INCS}
+CFLAGS = -Wall -g  ${INCS}
 LDFLAGS = ${LIBS}
 
 # compiler/linker

@@ -109,14 +109,16 @@ process_events(void)
                 break;
             case KEY:
                 sprintf(msg
-                        ,"key: %d, evt: %s"
+                        ,"t: %d key: %d, evt: %s"
+                        ,ev->time
                         ,ev->val1, (ev->val2) ? "DOWN" : "UP");
                 log_append(LOG_MESG, msg);
                 
                 break;
             case MOUSE:
                 sprintf(msg
-                        ,"mouse: (%d, %d)"
+                        ,"t: %d mouse: (%d, %d)"
+                        ,ev->time
                         ,ev->val1, ev->val2);
                 log_append(LOG_MESG, msg);
                 break;

@@ -3,19 +3,19 @@
 #include <SDL2/SDL.h>
 
 #include "logger.h"
+#include "window.h"
 #include "event.h"
 
 #define BUFFER_SIZE 128
 #define MAX_EVENTS 1024
+#define TARGET_FPS 60
 
 
 static SDL_Thread *cli_thread;
 static SDL_sem *command_ready;
 static SDL_sem *command_processed;
 static char cli_buffer[BUFFER_SIZE];
-static SDL_Window *window;
-static SDL_Renderer *render;
-static int evt_id = 0;
+static int tick = 0;
 
 int
 cli_loop(void *arg)
@@ -49,7 +49,7 @@ cli_init(void)
 }
 
 void
-collect_events(void)
+collect_events(int tick)
 {
     //MOUSE
     //CONSOLE CHAR (NOP?)
@@ -65,7 +65,7 @@ collect_events(void)
         int data_len = strlen(cli_buffer) + 1;
         char *data = malloc(sizeof(char) * data_len);
         strncpy(data, cli_buffer, data_len);
-        eventqueue_post(evt_id++, CONSOLE, 0, 0, data_len, data);
+        eventqueue_post(tick, CONSOLE, 0, 0, data_len, data);
         SDL_SemPost(command_processed);
     }
 
@@ -75,7 +75,7 @@ collect_events(void)
         switch (e.type) {
             case SDL_KEYDOWN:
             case SDL_KEYUP:
-                eventqueue_post(evt_id++
+                eventqueue_post(tick
                         ,KEY
                         ,e.key.keysym.sym
                         ,(e.type == SDL_KEYDOWN) ? 1 : 0
@@ -84,7 +84,7 @@ collect_events(void)
                 break;
             case SDL_MOUSEBUTTONDOWN:
             case SDL_MOUSEBUTTONUP:
-                eventqueue_post(evt_id++
+                eventqueue_post(tick
                         ,KEY
                         ,e.button.button
                         ,(e.button.type == SDL_MOUSEBUTTONDOWN) ? 1 : 0
@@ -92,7 +92,7 @@ collect_events(void)
                         ,NULL);
                 break;
             case SDL_MOUSEMOTION:
-                eventqueue_post(evt_id++
+                eventqueue_post(tick
                         ,MOUSE
                         ,e.motion.x
                         ,e.motion.y
@@ -106,23 +106,6 @@ collect_events(void)
 }
 
 int
-init_window(int width, int height)
-{
-    window = SDL_CreateWindow("rinse"
-            ,SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED
-            ,width, height
-            ,SDL_WINDOW_SHOWN);
-            //,SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
-
-    if (!window) {
-        log_append(LOG_ERR, "Failed to get SDL window");
-        return -1;
-    }
-    render = SDL_CreateRenderer(window, -1, 0);
-    return 0;
-}
-
-int
 main(int argc, char **argv)
 {
     SDL_Init(SDL_INIT_VIDEO);
@@ -130,10 +113,29 @@ main(int argc, char **argv)
     init_logger();
     init_event_system(1024);
     init_window(300, 400);
+    unsigned int start_time = SDL_GetTicks();
+    unsigned int elapsed_time;
+    unsigned int timeout;
+    int start_tick = 0;
+    int elapsed_ticks;
+    int target_fps = 144;
     while(1) {
-        collect_events();
+        timeout = SDL_GetTicks() + (1.0 / (float)target_fps) *1000.0;
+        collect_events(tick);
         process_events();
-        SDL_RenderClear(render);
+        clear_window();
+        tick++;
+        while(!SDL_TICKS_PASSED(SDL_GetTicks(), timeout));
+        if (tick%(60 * 3) == 0) {
+            elapsed_time = SDL_GetTicks() - start_time;
+            elapsed_ticks = tick - start_tick;
+            float fps;
+            fps = (float)elapsed_ticks / (float) elapsed_time;
+            fps *= 1000.0;
+            printf("fps: %f\n", fps);
+            start_time = SDL_GetTicks();
+            start_tick = tick;
+        }
     }
 
     return 0;
