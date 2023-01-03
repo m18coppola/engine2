@@ -126,7 +126,7 @@ main(int argc, char **argv)
         clear_window();
         tick++;
         while(!SDL_TICKS_PASSED(SDL_GetTicks(), timeout));
-        if (tick%(60 * 3) == 0) {
+        if (tick%(target_fps * 10) == 0) {
             elapsed_time = SDL_GetTicks() - start_time;
             elapsed_ticks = tick - start_tick;
             float fps;
