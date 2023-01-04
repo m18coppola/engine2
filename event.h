@@ -8,8 +8,6 @@ enum EventType {
     DEBUG
 };
 
-int init_event_system(int buffer_length);
-void close_event_system(void);
 int eventqueue_is_empty(void);
 int eventqueue_is_full(void);
 int eventqueue_post(int time, enum EventType type, int val1, int val2, int data_size, char *data);

@@ -25,6 +25,8 @@ init_window(int width, int height)
 void
 clear_window(void)
 {
-    SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
+    SDL_SetRenderDrawColor(render, 255, 0, 0, 255);
     SDL_RenderClear(render);
+    //SDL_UpdateWindowSurface(window);
+    SDL_RenderPresent(render);
 }

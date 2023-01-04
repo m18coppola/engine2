@@ -2,6 +2,7 @@
 #include "logger.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #define MAX_CMDS 64
@@ -11,6 +12,7 @@
 
 struct ConVar {
     unsigned int hash;
+    char name[32];
     char value[128];
 };
 
@@ -30,25 +32,40 @@ cvar_hash(char *str)
 char*
 cvar_get_value(char *name)
 {
-    unsigned int hash = cvar_hash(name);
-    int index = hash % MAX_VARS;
-    while (cvar_table[index].hash != hash && cvar_table[index].hash != 0) {
-        index++;
-    }
-    if (cvar_table[index].hash == 0) {
-        return NULL;
-    }
-    return cvar_table[index].value;
+    struct ConVar *cvar;
+
+    for (cvar = &cvar_table[cvar_hash(name) % MAX_VARS];
+            strcmp(name, cvar->name) && cvar->hash != 0;
+            cvar++)
+        ;
+    return cvar->value;
 }
 
 void
 cvar_set_value(char *name, char *value)
 {
-    unsigned int hash = cvar_hash(name);
-    int index = hash % MAX_VARS;
-    while (cvar_table[index].hash != hash && cvar_table[index].hash != 0) {
-        index++;
+    struct ConVar *cvar;
+    for (cvar = &cvar_table[cvar_hash(name) % MAX_VARS];
+            strcmp(name, cvar->name) && cvar->hash != 0; cvar++)
+        ;
+    strcpy(cvar->value, value);
+}
+
+void
+parse_command(char *command_str)
+{
+    char token_buffer[128];
+    char *token_ptr;
+    char *value_dest;
+
+    token_ptr = token_buffer;
+    while ((*token_ptr++ = *command_str++) && *command_str != ' ')
+        ;
+    *token_ptr = '\0';
+    value_dest = cvar_get_value(token_buffer);
+    if (!*command_str) {
+        log_append(LOG_MESG, value_dest);
+    } else {
+        strcpy(value_dest, ++command_str);
     }
-    cvar_table[index].hash = hash;
-    strcpy(cvar_table[index].value, value);
 }

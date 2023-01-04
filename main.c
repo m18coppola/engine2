@@ -111,7 +111,6 @@ main(int argc, char **argv)
     SDL_Init(SDL_INIT_VIDEO);
     cli_init();
     init_logger();
-    init_event_system(1024);
     init_window(300, 400);
     unsigned int start_time = SDL_GetTicks();
     unsigned int elapsed_time;
@@ -119,13 +118,16 @@ main(int argc, char **argv)
     int start_tick = 0;
     int elapsed_ticks;
     int target_fps = 144;
-    while(1) {
+
+    while (1) {
         timeout = SDL_GetTicks() + (1.0 / (float)target_fps) *1000.0;
         collect_events(tick);
         process_events();
         clear_window();
+        while(!SDL_TICKS_PASSED(SDL_GetTicks(), timeout)); // spin quick frames
         tick++;
-        while(!SDL_TICKS_PASSED(SDL_GetTicks(), timeout));
+
+        // determine frame performance
         if (tick%(target_fps * 10) == 0) {
             elapsed_time = SDL_GetTicks() - start_time;
             elapsed_ticks = tick - start_tick;

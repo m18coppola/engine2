@@ -4,11 +4,9 @@
 
 #include "event.h"
 #include "logger.h"
+#include "cvar.h"
 
-static int head;
-static int tail;
-static int capacity;
-static struct Event *queue;
+#define MAX_EVENTS 1024
 
 struct Event {
     int time;
@@ -18,22 +16,9 @@ struct Event {
     void *data;
 };
 
-int
-init_event_system(int event_buffer_length)
-{
-    queue = malloc(sizeof(struct Event) * event_buffer_length);
-    head = -1;
-    tail = -1;
-    capacity = event_buffer_length;
-    return 0;
-}
-
-void
-close_event_system(void)
-{
-    free(queue);
-    queue = NULL;
-}
+static int head = -1;
+static int tail = -1;
+static struct Event queue[MAX_EVENTS];
 
 int
 eventqueue_is_empty(void)
@@ -44,7 +29,7 @@ eventqueue_is_empty(void)
 int
 eventqueue_is_full(void)
 {
-    return (head == tail + 1) || (head == 0 && tail == capacity - 1);
+    return (head == tail + 1) || (head == 0 && tail == MAX_EVENTS - 1);
 }
 
 int
@@ -56,7 +41,7 @@ eventqueue_post(int time, enum EventType type, int val1, int val2,
         return -1;
     }
     if (head == -1) head = 0;
-    tail = (tail + 1) % capacity;
+    tail = (tail + 1) % MAX_EVENTS;
     queue[tail].time = time;
     queue[tail].type = type;
     queue[tail].val1 = val1;
@@ -79,7 +64,7 @@ eventqueue_poll(void)
         head = -1;
         tail = -1;
     } else {
-        head = (head + 1) % capacity;
+        head = (head + 1) % MAX_EVENTS;
     }
     return ev;
 }
@@ -89,7 +74,6 @@ buffer_events(void)
 {
     ;
 }
-
 
 void
 process_events(void)
@@ -101,10 +85,7 @@ process_events(void)
         char msg[512];
         switch (ev->type) {
             case CONSOLE:
-                log_append(LOG, (char *)ev->data);
-                if (!strcmp(ev->data, "exit")) {
-                    deffered_exit = 1;
-                }
+                parse_command((char *)ev->data);
                 free(ev->data);
                 break;
             case KEY:
