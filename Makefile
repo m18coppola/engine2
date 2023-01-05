@@ -5,6 +5,8 @@ OBJ = ${SRC:.c=.o}
 
 all: options main
 
+debug: CFLAGS += -DDEBUG_KB -DDEBUG_MOUSE
+debug: main
 
 options:
 	@echo build options:
