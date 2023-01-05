@@ -9,8 +9,6 @@
 
 #define BUFFER_SIZE 128
 #define MAX_EVENTS 1024
-#define TARGET_FPS 60
-
 
 static SDL_Thread *cli_thread;
 static SDL_sem *command_ready;
@@ -138,6 +136,19 @@ main(int argc, char **argv)
         timeout = SDL_GetTicks() + (1.0 / (float)target_fps) *1000.0;
         collect_events(tick);
         process_events();
+
+        /*
+        if (client) {
+            parse_gamestate_packet();
+            events_to_cmd_packet();
+            send_msg();
+        } else {
+            parse_cmd_packets();
+            game_tick();
+            broadcast_state();
+        }
+        */
+
         clear_window();
         //render_gl_test();
         while(!SDL_TICKS_PASSED(SDL_GetTicks(), timeout)); // spin quick frames
