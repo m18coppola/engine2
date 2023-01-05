@@ -1,3 +1,4 @@
+#pragma once
 enum LogType {
     LOG_EVENT = 0,
     LOG_MESG,

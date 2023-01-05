@@ -5,6 +5,7 @@
 #include "logger.h"
 #include "window.h"
 #include "event.h"
+#include "cvar.h"
 
 #define BUFFER_SIZE 128
 #define MAX_EVENTS 1024
@@ -36,7 +37,7 @@ cli_loop(void *arg)
                 cli_buffer[i++%BUFFER_SIZE] = c;
         }
     }
-    return 0;
+    exit(0);
 }
 
 void
@@ -105,21 +106,34 @@ collect_events(int tick)
     }
 }
 
+void
+load_config(char *filename)
+{
+    char *config_string = SDL_LoadFile(filename, NULL);
+    char *line;
+    line = strtok(config_string, "\n");
+    do {
+        parse_command(line);
+    } while ((line = strtok(NULL, "\n")));
+    SDL_free(config_string);
+}
+
 int
 main(int argc, char **argv)
 {
-    SDL_Init(SDL_INIT_VIDEO);
-    cli_init();
     init_logger();
-    init_window(300, 400);
-    //init_gl_test(300, 400);
+    load_config("init.cfg");
+    cli_init();
+    SDL_Init(SDL_INIT_VIDEO);
+    init_window(atoi(cvar_get_value("width")), atoi(cvar_get_value("height")));
+    //init_gl_test(atoi(cvar_get_value("width")), atoi(cvar_get_value("height")));
+
     unsigned int start_time = SDL_GetTicks();
     unsigned int elapsed_time;
     unsigned int timeout;
     int start_tick = 0;
     int elapsed_ticks;
-    int target_fps = 144;
-
+    int target_fps = atoi(cvar_get_value("target_fps"));
     while (1) {
         timeout = SDL_GetTicks() + (1.0 / (float)target_fps) *1000.0;
         collect_events(tick);

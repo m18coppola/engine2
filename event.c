@@ -89,19 +89,23 @@ process_events(void)
                 free(ev->data);
                 break;
             case KEY:
+#ifdef DEBUG_KB
                 sprintf(msg
                         ,"t: %d key: %d, evt: %s"
                         ,ev->time
                         ,ev->val1, (ev->val2) ? "DOWN" : "UP");
                 log_append(LOG_MESG, msg);
+#endif
                 
                 break;
             case MOUSE:
+#ifdef DEBUG_MOUSE
                 sprintf(msg
                         ,"t: %d mouse: (%d, %d)"
                         ,ev->time
                         ,ev->val1, ev->val2);
                 log_append(LOG_MESG, msg);
+#endif
                 break;
             default:
                 sprintf(msg

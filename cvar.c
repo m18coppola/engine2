@@ -61,6 +61,7 @@ parse_command(char *command_str)
     token_ptr = token_buffer;
     while ((*token_ptr++ = *command_str++) && *command_str != ' ')
         ;
+    command_str--;
     *token_ptr = '\0';
     value_dest = cvar_get_value(token_buffer);
     if (!*command_str) {
