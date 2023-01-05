@@ -1,3 +1,4 @@
+#pragma once
 enum EventType {
     NONE = 0, //timestamp is valid
     KEY, //val1 is keycode, val2 is 1 if down event, 0 if up event

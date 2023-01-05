@@ -37,7 +37,7 @@ cli_loop(void *arg)
                 cli_buffer[i++%BUFFER_SIZE] = c;
         }
     }
-    return 0;
+    exit(0);
 }
 
 void
