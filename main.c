@@ -112,6 +112,7 @@ main(int argc, char **argv)
     cli_init();
     init_logger();
     init_window(300, 400);
+    //init_gl_test(300, 400);
     unsigned int start_time = SDL_GetTicks();
     unsigned int elapsed_time;
     unsigned int timeout;
@@ -124,6 +125,7 @@ main(int argc, char **argv)
         collect_events(tick);
         process_events();
         clear_window();
+        //render_gl_test();
         while(!SDL_TICKS_PASSED(SDL_GetTicks(), timeout)); // spin quick frames
         tick++;
 

@@ -11,8 +11,10 @@ MATHINC =
 SDLLIBS = `sdl2-config --libs`
 SDLINC = `sdl2-config --cflags`
 
+EPOXYLIBS = -lepoxy
+
 # includes and libs
-LIBS = ${MATHLIBS} ${SDLLIBS}
+LIBS = ${MATHLIBS} ${SDLLIBS} ${EPOXYLIBS}
 INCS = ${SDLINC} 
 
 # flags
