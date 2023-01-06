@@ -79,10 +79,10 @@ void
 process_events(void)
 {
     int deffered_exit = 0;
+    char msg[512];
     while(!eventqueue_is_empty()) {
         struct Event *ev;
         ev = eventqueue_poll();
-        char msg[512];
         switch (ev->type) {
             case CONSOLE:
                 parse_command((char *)ev->data);

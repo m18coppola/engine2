@@ -133,7 +133,7 @@ main(int argc, char **argv)
     int elapsed_ticks;
     int target_fps = atoi(cvar_get_value("target_fps"));
     while (1) {
-        timeout = SDL_GetTicks() + (1.0 / (float)target_fps) *1000.0;
+        timeout = SDL_GetTicks();
         collect_events(tick);
         process_events();
 
@@ -151,7 +151,7 @@ main(int argc, char **argv)
 
         clear_window();
         //render_gl_test();
-        while(!SDL_TICKS_PASSED(SDL_GetTicks(), timeout)); // spin quick frames
+        SDL_Delay(timeout + ((1.0/(float)target_fps) * 1000) - SDL_GetTicks());
         tick++;
 
         // determine frame performance
