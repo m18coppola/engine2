@@ -1,6 +1,6 @@
 include config.mk
 
-SRC = main.c logger.c event.c window.c cvar.c game.c
+SRC = main.c logger.c event.c window.c cvar.c game.c input.c
 OBJ = ${SRC:.c=.o}
 
 all: options main
