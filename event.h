@@ -15,6 +15,3 @@ int eventqueue_post(int time, enum EventType type, int val1, int val2, int data_
 struct Event *eventqueue_poll(void);
 void buffer_events(void);
 void process_events(void);
-void collect_events(int tick);
-int cli_loop(void *arg);
-void cli_init(void);

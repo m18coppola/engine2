@@ -5,13 +5,13 @@
 #include "logger.h"
 #include "window.h"
 #include "event.h"
-#include "cvar.h"
+#include "console.h"
 #include "input.h"
+#include "devcon.h"
 
 #define MAX_EVENTS 1024
 
 static int tick = 0;
-
 
 void
 load_config(char *filename)
@@ -48,7 +48,8 @@ main(int argc, char **argv)
     int target_fps = atoi(cvar_get_value("target_fps"));
     while (1) {
         timeout = SDL_GetTicks();
-        collect_events(tick);
+        cli_buffer_event(tick);
+        input_buffer_events(tick);
         process_events();
 
         /*

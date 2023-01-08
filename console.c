@@ -1,4 +1,4 @@
-#include "cvar.h"
+#include "console.h"
 #include "logger.h"
 
 #include <stdlib.h>

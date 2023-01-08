@@ -5,11 +5,10 @@
 
 #include "event.h"
 #include "logger.h"
-#include "cvar.h"
+#include "console.h"
 #include "input.h"
 
 #define MAX_EVENTS 1024
-#define CLI_BUFFER_SIZE 128
 
 struct Event {
     int time;
@@ -23,10 +22,6 @@ static int head = -1;
 static int tail = -1;
 static struct Event queue[MAX_EVENTS];
 
-static SDL_Thread *cli_thread;
-static SDL_sem *command_ready;
-static SDL_sem *command_processed;
-static char cli_buffer[CLI_BUFFER_SIZE];
 
 int
 eventqueue_is_empty(void)
@@ -78,36 +73,6 @@ eventqueue_poll(void)
 }
 
 
-static void
-parse_sdl_event(SDL_Event e, int tick)
-{
-    switch (e.type) {
-        case SDL_KEYDOWN:
-        case SDL_KEYUP:
-            if (!e.key.repeat)
-                eventqueue_post(tick
-                        ,KEY
-                        ,e.key.keysym.scancode
-                        ,(e.type == SDL_KEYDOWN) ? 1 : 0
-                        ,0
-                        ,NULL);
-            break;
-        case SDL_MOUSEBUTTONDOWN:
-        case SDL_MOUSEBUTTONUP:
-            break;
-        case SDL_MOUSEMOTION:
-            eventqueue_post(tick
-                    ,MOUSE
-                    ,e.motion.x
-                    ,e.motion.y
-                    ,0
-                    ,NULL);
-            break;
-        case SDL_QUIT:
-            exit(0);
-    }
-
-}
 
 void
 process_events(void)
@@ -137,63 +102,3 @@ process_events(void)
     }
     if (deffered_exit) exit(0);
 }
-
-int
-cli_loop(void *arg)
-{
-    char c;
-    int i;
-
-    i = 0;
-    while ((c = getchar()) != EOF) {
-        switch (c) {
-            case '\n': /* submit */
-                cli_buffer[i%CLI_BUFFER_SIZE] = '\0';
-                SDL_SemPost(command_ready);
-                SDL_SemWait(command_processed);
-                i = 0;
-                break;
-            default:
-                cli_buffer[i++%CLI_BUFFER_SIZE] = c;
-        }
-    }
-    exit(0);
-}
-
-void
-cli_init(void)
-{
-    setbuf(stdout, NULL); /* turn off stdout buffering to smooth thread printing */
-    command_ready = SDL_CreateSemaphore(0);
-    command_processed = SDL_CreateSemaphore(0);
-	cli_thread = SDL_CreateThread((SDL_ThreadFunction)cli_loop, "CLI", NULL);
-}
-
-void
-collect_events(int tick)
-{
-    //MOUSE
-    //CONSOLE CHAR (NOP?)
-    //NET
-    
-    /*
-     * CONSOLE PARSE
-     * dump asynchronus console buffer, push onto evtq
-     * one cmd per tick (may have to extend...)
-     * maybe dump init-exec cvars onto evtq manually?
-     */
-    if (SDL_SemTryWait(command_ready) != SDL_MUTEX_TIMEDOUT) {
-        int data_len = strlen(cli_buffer) + 1;
-        char *data = malloc(sizeof(char) * data_len);
-        strncpy(data, cli_buffer, data_len);
-        eventqueue_post(tick, CONSOLE, 0, 0, data_len, data);
-        SDL_SemPost(command_processed);
-    }
-
-
-	SDL_Event e;
-    while (SDL_PollEvent(&e) != 0) {
-        parse_sdl_event(e, tick);
-    }
-}
-

@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
 #include "game.h"
-#include "cvar.h"
+#include "console.h"
 
 //static struct PlayerState pstate = {0};
