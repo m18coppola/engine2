@@ -5,7 +5,7 @@
 
 #include "event.h"
 #include "logger.h"
-#include "console.h"
+#include "cvar.h"
 #include "input.h"
 
 #define MAX_EVENTS 1024

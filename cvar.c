@@ -1,11 +1,10 @@
-#include "console.h"
+#include "cvar.h"
 #include "logger.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
-#define MAX_CMDS 64
 #define MAX_VARS 64
 #define FNV_OFFSET 0xcbf29ce484222325
 #define FNV_PRIME 0x100000001b3

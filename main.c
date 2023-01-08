@@ -5,11 +5,9 @@
 #include "logger.h"
 #include "window.h"
 #include "event.h"
-#include "console.h"
+#include "cvar.h"
 #include "input.h"
 #include "devcon.h"
-
-#define MAX_EVENTS 1024
 
 static int tick = 0;
 
@@ -37,7 +35,6 @@ main(int argc, char **argv)
     cli_init();
     SDL_Init(SDL_INIT_VIDEO);
     init_window(atoi(cvar_get_value("width")), atoi(cvar_get_value("height")));
-    set_debug_binds();
     //init_gl_test(atoi(cvar_get_value("width")), atoi(cvar_get_value("height")));
 
     unsigned int start_time = SDL_GetTicks();
