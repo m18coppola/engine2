@@ -3,16 +3,17 @@
 #include <SDL2/SDL.h>
 #include "logger.h"
 #include "window.h"
+#include "cvar.h"
 
 static SDL_Window *window;
 static SDL_Renderer *render;
 
 int
-init_window(int width, int height)
+init_window(void)
 {
     window = SDL_CreateWindow("rinse"
             ,SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED
-            ,width, height
+            ,cvar_get_value("width"), cvar_get_value("height")
             ,SDL_WINDOW_SHOWN);
             //,SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
 

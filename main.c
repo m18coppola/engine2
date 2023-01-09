@@ -11,6 +11,18 @@
 
 static int tick = 0;
 
+static struct ConVar width_cvar = {"width", "400"};
+static struct ConVar height_cvar = {"height", "300"};
+static struct ConVar target_fps_cvar = {"target_fps", "60"};
+
+void
+load_default_config(void)
+{
+    cvar_register(&width_cvar);
+    cvar_register(&height_cvar);
+    cvar_register(&target_fps_cvar);
+}
+
 void
 load_config(char *filename)
 {
@@ -31,10 +43,11 @@ main(int argc, char **argv)
     return 0;
 #endif
     init_logger();
-    load_config("init.cfg");
+    //load_config("init.cfg");
+    load_default_config();
     cli_init();
     SDL_Init(SDL_INIT_VIDEO);
-    init_window(atoi(cvar_get_value("width")), atoi(cvar_get_value("height")));
+    init_window();
     //init_gl_test(atoi(cvar_get_value("width")), atoi(cvar_get_value("height")));
 
     unsigned int start_time = SDL_GetTicks();
@@ -42,7 +55,7 @@ main(int argc, char **argv)
     unsigned int timeout;
     int start_tick = 0;
     int elapsed_ticks;
-    int target_fps = atoi(cvar_get_value("target_fps"));
+    int target_fps = cvar_get_value("target_fps");
     while (1) {
         timeout = SDL_GetTicks();
         cli_buffer_event(tick);
