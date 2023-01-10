@@ -84,7 +84,7 @@ process_events(void)
         ev = eventqueue_poll();
         switch (ev->type) {
             case CONSOLE:
-                parse_command((char *)ev->data);
+                cvar_exec((char *)ev->data);
                 free(ev->data);
                 break;
             case KEY:
