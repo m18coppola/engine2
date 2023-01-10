@@ -13,6 +13,12 @@ struct Token {
 	struct Token *next;
 };
 
+struct CallBackList {
+    void (*callback)(void);
+    struct CallBackList *next;
+};
+
+
 void cvar_set_cmd(ArgList arg_list);
 
 struct ConVar set_cmd = {FUNC, "set", 0, 0, cvar_set_cmd};
